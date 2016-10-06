@@ -4,6 +4,7 @@
 @toc
 
 todo
+make work without rootscope, dat nasty
 make modal a template
 specify contents of alert, eg title and text
 types, eg error, success, info, etc
