@@ -1,6 +1,6 @@
 {
   "name": "ngAlertGuy",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "author": "Melon Web Design",
   "main": "gulpfile.js",
@@ -11,8 +11,6 @@
     "gulp-sass": "^2.3.1",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-uglify": "^1.5.3",
-    "fs": "*",
-    "path": "*",
     "merge-stream": "*",
     "gulp-rename": "*"
   },
