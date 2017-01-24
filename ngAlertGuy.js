@@ -1,26 +1,37 @@
 /**
-@fileOverview
+ @fileOverview
 
-@toc
+ @toc
 
-todo
-make modal a template
-types, eg error, success, info, etc
-make buttons goto a particular path? eg back to start of vehicle section
-*/
+ todo
+ make modal a template
+ types, eg error, success, info, etc
+ make buttons goto a particular path? eg back to start of vehicle section
+ */
 
 'use strict';
 
 angular.module('ngAlertGuy', ['ngSanitize'])
-	.service('alertGuy', ['$q', function ($q) {
+	.service('alertGuy', ['$q', '$sce', function ($q, $sce) {
 
 		//public methods
 		var self = {
 			alert: function (opts) {
 				self.toggle();
 				self.title = opts.title;
-				self.text = opts.text;
 				self.allowHtmlText = !!opts.allowHtmlText;
+
+				self.confirmButton = opts.confirmButton !== undefined? !!opts.confirmButton : true;
+				self.dismissButton = opts.dismissButton !== undefined? !!opts.dismissButton : false;
+
+				self.confirmText = opts.confirmText !== undefined? opts.confirmText : 'Ok';
+				self.dismissText = opts.dismissText !== undefined? opts.dismissText : 'Cancel';
+
+				if (self.allowHtmlText) {
+					self.text = $sce.trustAsHtml(opts.text);
+				} else {
+					self.text = opts.text;
+				}
 				// optional
 				if (opts.confirmCallback) {
 					self.confirmCallback = opts.confirmCallback;
@@ -74,32 +85,32 @@ angular.module('ngAlertGuy', ['ngSanitize'])
 
 		return self;
 	}])
-.directive('alertGuy', ['alertGuy', '$sce', function (alertGuy, $sce) {
-	var text = alertGuy.allowHtmlText? '<div ng-bind-html="alertGuy.text"></div>' : '<div>{{alertGuy.text}}</div>';
-	alertGuy.text = alertGuy.allowHtmlText? $sce.trustAsHtml(alertGuy.text) : alertGuy.text;
-        return {
-        	restrict: 'E',
-       		template:
-'<section class="section-modal modal-alert" ng-show="alertGuy.show">' +
-	'<div class="sub-overlay" ng-click="alertGuy.toggle()"><!-- --></div>' +
-	'<div class="sub-inner mod-mid">' +
-		'<header class="header-modal">' +
+	.directive('alertGuy', ['alertGuy', function (alertGuy) {
+		return {
+			restrict: 'E',
+			template:
+			'<section class="section-modal modal-alert" ng-show="alertGuy.show">' +
+			'<div class="sub-overlay" ng-click="alertGuy.toggle()"><!-- --></div>' +
+			'<div class="sub-inner mod-mid">' +
+			'<header class="header-modal">' +
 			'<div class="sub-controls">' +
-				'<button class="btn btn-med btn-inline btn-back mod-light icon-close" ng-click="alertGuy.dismiss()"></button>' +
+			'<button class="btn btn-med btn-inline btn-back mod-light icon-close" ng-click="alertGuy.dismiss()"></button>' +
 			'</div>' +
-		'</header>' +
-		'<div class="container mod-mid">' +
+			'</header>' +
+			'<div class="container mod-mid">' +
 			'<h1>{{alertGuy.title}}</h1>' +
-			text +
+			'<div ng-if="alertGuy.allowHtmlText" ng-bind-html="alertGuy.text"></div>' +
+			'<div ng-if="!alertGuy.allowHtmlText">{{alertGuy.text}}</div>' +
+
 			'<br>' +
 			'<button class="btn btn-primary btn-text btn-inline" ng-show="alertGuy.confirmButton" ng-click="alertGuy.confirm()">{{alertGuy.confirmText}}</button>' +
 			'<button class="btn btn-primary btn-text btn-inline" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText}}</button>' +
-		'</div>' +
-	'</div>' +
-'</section>',
-            link: function ($scope, elem, attrs) {
+			'</div>' +
+			'</div>' +
+			'</section>',
+			link: function ($scope, elem, attrs) {
 
 				$scope.alertGuy = alertGuy;
-            }
-        };
-    }]);
+			}
+		};
+	}]);
