@@ -11,80 +11,127 @@
 
 'use strict';
 
-angular.module('ngAlertGuy', ['ngSanitize'])
-	.service('alertGuy', ['$q', '$sce', function ($q, $sce) {
+function AlertGuy(defaultOpts, $q, $sce, $translate) {
+	var self = this;
+	self.defaultOpts = defaultOpts;
 
-		//public methods
-		var self = {
-			alert: function (opts) {
-				self.toggle();
-				self.title = opts.title;
-				self.allowHtmlText = !!opts.allowHtmlText;
+	self.alert = function (opts) {
+		self.toggle();
+		self.title = opts.title;
+		self.allowHtmlText = !!opts.allowHtmlText || self.defaultOpts.allowHtmlText;
 
-				self.confirmButton = opts.confirmButton !== undefined? !!opts.confirmButton : true;
-				self.dismissButton = opts.dismissButton !== undefined? !!opts.dismissButton : false;
+		self.confirmButton = opts.confirmButton !== undefined?
+			!!opts.confirmButton :
+			self.defaultOpts.confirmButton;
+		self.dismissButton = opts.dismissButton !== undefined?
+			!!opts.dismissButton :
+			self.defaultOpts.confirmButton;
 
-				self.confirmText = opts.confirmText !== undefined? opts.confirmText : 'Ok';
-				self.dismissText = opts.dismissText !== undefined? opts.dismissText : 'Cancel';
+		self.confirmText = opts.confirmText !== undefined?
+			opts.confirmText :
+			self.defaultOpts.confirmText;
+		self.dismissText = opts.dismissText !== undefined?
+			opts.dismissText :
+			self.defaultOpts.dismissText;
 
-				if (self.allowHtmlText) {
-					self.text = $sce.trustAsHtml(opts.text);
-				} else {
-					self.text = opts.text;
-				}
-				// optional
-				if (opts.confirmCallback) {
-					self.confirmCallback = opts.confirmCallback;
-				}
-				if (opts.dismissCallback) {
-					self.dismissCallback = opts.dismissCallback;
-				}
-			},
+		self.translateUI = opts.translateUI !== undefined?
+			opts.translateUI :
+			self.defaultOpts.translateUI;
 
-			alertPromise: function (opts) {
-				return $q(function(resolve, reject) {
-					opts.confirmCallback = function() {
-						resolve(self);
-					};
+		var allowHtmlText = self.allowHtmlText !== undefined?
+			self.allowHtmlText :
+			self.defaultOpts.allowHtmlText;
+		if (opts.text && allowHtmlText) {
+			self.text = $sce.trustAsHtml(opts.text);
+		} else {
+			self.text = opts.text;
+		}
+		// optional
+		if (opts.confirmCallback) {
+			self.confirmCallback = opts.confirmCallback;
+		} else {
+			self.confirmCallback = self.defaultOpts.confirmCallback;
+		}
+		if (opts.dismissCallback) {
+			self.dismissCallback = opts.dismissCallback;
+		} else {
+			self.dismissCallback = self.defaultOpts.dismissCallback;
+		}
+	};
 
-					opts.dismissCallback = function() {
-						reject('modalDismissed');
-					};
+	self.alertPromise = function (opts) {
+		return $q(function(resolve, reject) {
+			opts.confirmCallback = function() {
+				resolve(self);
+			};
 
-					self.alert(opts);
-				});
-			},
+			opts.dismissCallback = function() {
+				reject('modalDismissed');
+			};
 
-			show: false,
-			toggle: function () {
-				self.show = !self.show;
-			},
-			title: '',
-			text: '',
+			self.alert(opts);
+		});
+	};
 
-			confirm: function() {
-				self.toggle();
-				self.confirmCallback();
-			},
+	self.localizedAlert = function (opts) {
+		var transKeys = [opts.title];
+		if (opts.text) {
+			transKeys.push(opts.text);
+		}
+
+		return $translate(transKeys).then(function (translations) {
+			console.log(translations);
+			opts.title = translations[opts.title];
+
+			if(opts.text) {
+				opts.text = translations[opts.text];
+			}
+
+			return self.alertPromise(opts);
+		}).catch(function () {
+			return self.alertPromise(opts);
+		});
+	};
+
+	self.toggle = function () {
+		self.show = !self.show;
+	};
+
+	self.confirm = function() {
+		self.toggle();
+		self.confirmCallback();
+	};
+
+
+
+	self.dismiss = function() {
+		self.toggle();
+		self.dismissCallback();
+	};
+}
+
+angular.module('ngAlertGuy', ['ngSanitize', 'pascalprecht.translate'])
+	.provider('alertGuy', function() {
+		var provider = this;
+		provider.defaultOpts = {
 			confirmButton: true,
-			confirmText: 'Ok',
+			dismissButton: false,
+			confirmText: 'OK',
+			dismissText: 'Cancel',
+			allowHtmlText: false,
+			translateUI: false,
 			confirmCallback: function() {
 				console.log('default confirm');
 			},
-
-			dismiss: function() {
-				self.toggle();
-				self.dismissCallback();
-			},
-			dismissButton: false,
-			dismissText: 'Cancel',
 			dismissCallback: function() {
 				console.log('default dismiss');
 			}
 		};
 
-		return self;
-	}])
+		this.$get = ['$q', '$sce', '$translate', function ($q, $sce, $translate) {
+			return new AlertGuy(provider.defaultOpts, $q, $sce, $translate);
+		}];
+	})
 	.directive('alertGuy', ['alertGuy', function (alertGuy) {
 		return {
 			restrict: 'E',
@@ -103,8 +150,10 @@ angular.module('ngAlertGuy', ['ngSanitize'])
 			'<div ng-if="!alertGuy.allowHtmlText">{{alertGuy.text}}</div>' +
 
 			'<br>' +
-			'<button class="btn btn-primary btn-text btn-inline" ng-show="alertGuy.confirmButton" ng-click="alertGuy.confirm()">{{alertGuy.confirmText}}</button>' +
-			'<button class="btn btn-primary btn-text btn-inline" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText}}</button>' +
+			'<button ng-if="alertGuy.translateUI" class="btn btn-primary btn-text btn-inline" ng-show="alertGuy.confirmButton" ng-click="alertGuy.confirm()">{{alertGuy.confirmText | translate}}</button>' +
+			'<button ng-if="!alertGuy.translateUI" class="btn btn-primary btn-text btn-inline" ng-show="alertGuy.confirmButton" ng-click="alertGuy.confirm()">{{alertGuy.confirmText}}</button>' +
+			'<button ng-if="alertGuy.translateUI" class="btn btn-primary btn-text btn-inline" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText | translate}}</button>' +
+			'<button ng-if="!alertGuy.translateUI" class="btn btn-primary btn-text btn-inline" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText}}</button>' +
 			'</div>' +
 			'</div>' +
 			'</section>',
