@@ -57,6 +57,10 @@ function AlertGuy(defaultOpts, $q, $sce, $translate) {
 		} else {
 			self.dismissCallback = self.defaultOpts.dismissCallback;
 		}
+		if (opts.alertClass) {
+			self.alertClass = 'mod-'+opts.alertClass;
+			self.icon = '<div class="icon-huge icon-dialog-'+opts.alertClass+'"></div>';
+		}
 	};
 
 	self.alertPromise = function (opts) {
@@ -136,8 +140,9 @@ angular.module('ngAlertGuy', ['ngSanitize', 'pascalprecht.translate'])
 		return {
 			restrict: 'E',
 			template:
-			'<section class="section-modal modal-alert" ng-show="alertGuy.show">' +
+			'<section class="section-modal modal-alert" ng-class="alertGuy.alertClass" ng-show="alertGuy.show">' +
 			'<div class="sub-overlay" ng-click="alertGuy.toggle()"><!-- --></div>' +
+			'<div class="wrap-inner">' +
 			'<div class="sub-inner mod-mid">' +
 			'<header class="header-modal">' +
 			'<div class="sub-controls">' +
@@ -145,15 +150,15 @@ angular.module('ngAlertGuy', ['ngSanitize', 'pascalprecht.translate'])
 			'</div>' +
 			'</header>' +
 			'<div class="container mod-mid">' +
+			'<div ng-bind-html="alertGuy.icon"></div>' +
 			'<h1>{{alertGuy.title}}</h1>' +
 			'<div ng-if="alertGuy.allowHtmlText" ng-bind-html="alertGuy.text"></div>' +
 			'<div ng-if="!alertGuy.allowHtmlText">{{alertGuy.text}}</div>' +
-
-			'<br>' +
-			'<button ng-if="alertGuy.translateUI" class="btn btn-primary btn-text btn-inline" ng-show="alertGuy.confirmButton" ng-click="alertGuy.confirm()">{{alertGuy.confirmText | translate}}</button>' +
-			'<button ng-if="!alertGuy.translateUI" class="btn btn-primary btn-text btn-inline" ng-show="alertGuy.confirmButton" ng-click="alertGuy.confirm()">{{alertGuy.confirmText}}</button>' +
-			'<button ng-if="alertGuy.translateUI" class="btn btn-primary btn-text btn-inline" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText | translate}}</button>' +
-			'<button ng-if="!alertGuy.translateUI" class="btn btn-primary btn-text btn-inline" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText}}</button>' +
+			'<button ng-if="alertGuy.translateUI" class="btn btn-primary btn-text" ng-show="alertGuy.confirmButton" ng-click="alertGuy.confirm()">{{alertGuy.confirmText | translate}}</button>' +
+			'<button ng-if="!alertGuy.translateUI" class="btn btn-primary btn-text" ng-show="alertGuy.confirmButton" ng-click="alertGuy.confirm()">{{alertGuy.confirmText}}</button>' +
+			'<button ng-if="alertGuy.translateUI" class="btn btn-primary btn-link" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText | translate}}</button>' +
+			'<button ng-if="!alertGuy.translateUI" class="btn btn-primary btn-link" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText}}</button>' +
+			'</div>' +
 			'</div>' +
 			'</div>' +
 			'</section>',
