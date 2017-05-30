@@ -92,7 +92,11 @@ function AlertGuy(defaultOpts, $q, $sce, $translate) {
 			}
 
 			return self.alertPromise(opts);
-		}).catch(function () {
+		}).catch(function (reason, maybeSelf) {
+			if (reason === 'modalDismissed') {
+				return $q.reject(reason, maybeSelf);
+			}
+
 			return self.alertPromise(opts);
 		});
 	};
