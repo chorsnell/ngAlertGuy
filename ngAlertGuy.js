@@ -15,6 +15,8 @@ function AlertGuy(defaultOpts, $q, $sce, $translate) {
 	var self = this;
 	self.defaultOpts = defaultOpts;
 
+	self.dismissCallback = self.defaultOpts.dismissCallback;
+
 	self.alert = function (opts) {
 		self.toggle();
 		self.title = opts.title;
@@ -113,7 +115,7 @@ function AlertGuy(defaultOpts, $q, $sce, $translate) {
 
 
 	self.dismiss = function() {
-		self.toggle();
+		self.show = false;
 		self.dismissCallback();
 	};
 }
