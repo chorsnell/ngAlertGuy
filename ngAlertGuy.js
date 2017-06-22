@@ -134,7 +134,9 @@ function AlertGuy(defaultOpts, $q, $sce, $translate) {
     };
 
     self.toggle = function () {
-        self.show = !self.show;
+        if ((self.show && self.dismissCallback() !== false) || !self.show) {
+            self.show = !self.show;
+        }
     };
 
     self.confirm = function () {
