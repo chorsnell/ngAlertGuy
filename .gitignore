@@ -1,1 +1,4 @@
 /node_modules/
+/.idea
+/ngAlertGuy.iml
+bower_components

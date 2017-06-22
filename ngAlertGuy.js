@@ -11,8 +11,27 @@
 
 'use strict';
 
+// Optionals
+var depTestModule = 'ngAlertGuy.injectionTester';
+var optionalModules = ['pascalprecht.translate'];
+var deps = ['ngSanitize'];
+
+angular.module('ngAlertGuy.injectionTester', []);
+
+angular.forEach(function(module) {
+    try {
+        //Check if optionalModule is available
+        angular.module(depTestModule).requires.push(module);
+        deps.push(module);
+    } catch(e) {
+        console.log("Warn: module "+module+" not found.");
+    }
+}, optionalModules);
+
+var translateLoaded = deps.indexOf('pascalprecht.translate') !== -1;
+
 function AlertGuy(defaultOpts, $q, $sce, $translate) {
-	var self = this;
+    var self = this;
 	self.defaultOpts = defaultOpts;
 
 	self.dismissCallback = self.defaultOpts.dismissCallback;
@@ -80,6 +99,9 @@ function AlertGuy(defaultOpts, $q, $sce, $translate) {
 	};
 
 	self.localizedAlert = function (opts) {
+		// Disable if no ngTranslate
+		if (!translateLoaded) { return self.alertPromise(opts); }
+
 		var transKeys = [opts.title];
 		if (opts.text) {
 			transKeys.push(opts.text);
@@ -120,7 +142,7 @@ function AlertGuy(defaultOpts, $q, $sce, $translate) {
 	};
 }
 
-angular.module('ngAlertGuy', ['ngSanitize', 'pascalprecht.translate'])
+angular.module('ngAlertGuy', deps)
 	.provider('alertGuy', function() {
 		var provider = this;
 		provider.defaultOpts = {
@@ -138,7 +160,9 @@ angular.module('ngAlertGuy', ['ngSanitize', 'pascalprecht.translate'])
 			}
 		};
 
-		this.$get = ['$q', '$sce', '$translate', function ($q, $sce, $translate) {
+		this.$get = ['$q', '$sce', '$injector', function ($q, $sce, $injector) {
+            var $translate = translateLoaded? $injector.get('$translate') : null;
+
 			return new AlertGuy(provider.defaultOpts, $q, $sce, $translate);
 		}];
 	})
@@ -160,9 +184,9 @@ angular.module('ngAlertGuy', ['ngSanitize', 'pascalprecht.translate'])
 			'<h1>{{alertGuy.title}}</h1>' +
 			'<div ng-if="alertGuy.allowHtmlText" ng-bind-html="alertGuy.text"></div>' +
 			'<div ng-if="!alertGuy.allowHtmlText">{{alertGuy.text}}</div>' +
-			'<button ng-if="alertGuy.translateUI" class="btn btn-primary btn-text" ng-show="alertGuy.confirmButton" ng-click="alertGuy.confirm()">{{alertGuy.confirmText | translate}}</button>' +
+			translateLoaded? '<button ng-if="alertGuy.translateUI" class="btn btn-primary btn-text" ng-show="alertGuy.confirmButton" ng-click="alertGuy.confirm()">{{alertGuy.confirmText | translate}}</button>' : ''+
 			'<button ng-if="!alertGuy.translateUI" class="btn btn-primary btn-text" ng-show="alertGuy.confirmButton" ng-click="alertGuy.confirm()">{{alertGuy.confirmText}}</button>' +
-			'<button ng-if="alertGuy.translateUI" class="btn btn-primary btn-link" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText | translate}}</button>' +
+            translateLoaded? '<button ng-if="alertGuy.translateUI" class="btn btn-primary btn-link" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText | translate}}</button>' : '' +
 			'<button ng-if="!alertGuy.translateUI" class="btn btn-primary btn-link" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText}}</button>' +
 			'</div>' +
 			'</div>' +

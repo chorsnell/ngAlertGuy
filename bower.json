@@ -1,0 +1,26 @@
+{
+  "name": "ngAlertGuy",
+  "version": "3.0.0",
+  "description": "Angular Alert modal service",
+  "main": "ngAlertGuy.js",
+  "authors": [
+    "Melon Web Design"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "alert",
+    "angularjs"
+  ],
+  "homepage": "https://github.com/poppahorse/ngAlertGuy",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.5.0",
+    "angular-sanitize": "^1.5.0"
+  }
+}
