@@ -18,7 +18,7 @@ var deps = ['ngSanitize'];
 
 angular.module('ngAlertGuy.injectionTester', []);
 
-angular.forEach(function (module) {
+angular.forEach(optionalModules, function (module) {
     try {
         //Check if optionalModule is available
         angular.module(depTestModule).requires.push(module);
@@ -26,7 +26,7 @@ angular.forEach(function (module) {
     } catch (e) {
         console.log("Warn: module " + module + " not found.");
     }
-}, optionalModules);
+});
 
 var translateLoaded = deps.indexOf('pascalprecht.translate') !== -1;
 
