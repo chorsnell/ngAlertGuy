@@ -21,7 +21,7 @@ angular.module('ngAlertGuy.injectionTester', []);
 angular.forEach(optionalModules, function (module) {
     try {
         //Check if optionalModule is available
-        angular.module(depTestModule).requires.push(module);
+        angular.module(module);
         deps.push(module);
     } catch (e) {
         console.log("Warn: module " + module + " not found.");
