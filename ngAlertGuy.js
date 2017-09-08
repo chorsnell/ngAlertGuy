@@ -140,7 +140,7 @@ function AlertGuy(defaultOpts, $q, $sce, $translate) {
     };
 
     self.confirm = function () {
-        self.toggle();
+        self.show = false;
         self.confirmCallback();
     };
 
