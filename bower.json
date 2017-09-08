@@ -1,6 +1,6 @@
 {
   "name": "ngAlertGuy",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "Angular Alert modal service",
   "main": "ngAlertGuy.js",
   "authors": [
