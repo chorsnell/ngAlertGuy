@@ -21,7 +21,7 @@ angular.module('ngAlertGuy.injectionTester', []);
 angular.forEach(optionalModules, function (module) {
     try {
         //Check if optionalModule is available
-        angular.module(module);
+        angular.module(depTestModule).requires.push(module);
         deps.push(module);
     } catch (e) {
         console.log("Warn: module " + module + " not found.");
@@ -134,9 +134,7 @@ function AlertGuy(defaultOpts, $q, $sce, $translate) {
     };
 
     self.toggle = function () {
-        if ((self.show && self.dismissCallback() !== false) || !self.show) {
-            self.show = !self.show;
-        }
+        self.show = true;
     };
 
     self.confirm = function () {
@@ -180,7 +178,7 @@ angular.module('ngAlertGuy', deps)
         return {
             restrict: 'E',
             template: '<section class="section-modal modal-alert" ng-class="alertGuy.alertClass" ng-if="alertGuy.show">' +
-            '<div class="sub-overlay" ng-click="alertGuy.toggle()"><!-- --></div>' +
+            '<div class="sub-overlay" ng-click="alertGuy.dismiss()"><!-- --></div>' +
             '<div class="wrap-inner">' +
             '<div class="sub-inner mod-mid">' +
             '<header class="header-modal">' +
