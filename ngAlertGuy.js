@@ -34,6 +34,8 @@ function AlertGuy(defaultOpts, $q, $sce, $translate) {
     var self = this;
     self.defaultOpts = defaultOpts;
 
+    self.translationAvailable = translateLoaded;
+
     self.dismissCallback = self.defaultOpts.dismissCallback;
 
     self.alert = function (opts) {
@@ -83,7 +85,7 @@ function AlertGuy(defaultOpts, $q, $sce, $translate) {
         }
 
         // Never translate when ngTranslate is not used
-        if (!translateLoaded) {
+        if (!self.translationAvailable) {
             opts.translateUI = false;
         }
 
@@ -106,7 +108,7 @@ function AlertGuy(defaultOpts, $q, $sce, $translate) {
 
     self.localizedAlert = function (opts) {
         // Disable if no ngTranslate
-        if (!translateLoaded) {
+        if (!self.translationAvailable) {
             return self.alertPromise(opts);
         }
 
