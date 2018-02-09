@@ -181,20 +181,15 @@ angular.module('ngAlertGuy', deps)
             '<div class="sub-overlay" ng-click="alertGuy.dismiss()"><!-- --></div>' +
             '<div class="wrap-inner">' +
             '<div class="sub-inner mod-mid">' +
-            '<header class="header-modal">' +
-            '<div class="sub-controls">' +
-            '<button class="btn btn-med btn-inline btn-back mod-light icon-close" ng-click="alertGuy.dismiss()"></button>' +
-            '</div>' +
-            '</header>' +
             '<div class="container mod-mid">' +
             '<div ng-bind-html="alertGuy.icon"></div>' +
             '<h1>{{alertGuy.title}}</h1>' +
             '<div ng-if="alertGuy.allowHtmlText" ng-bind-html="alertGuy.text"></div>' +
             '<div ng-if="!alertGuy.allowHtmlText">{{alertGuy.text}}</div>' +
+            '<button ng-if="alertGuy.translateUI" class="btn btn-default" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText | translate}}</button>' +
+            '<button ng-if="!alertGuy.translateUI" class="btn btn-default" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText}}</button>' +
             '<button ng-if="alertGuy.translateUI" class="btn btn-primary btn-text" ng-show="alertGuy.confirmButton" ng-click="alertGuy.confirm()">{{alertGuy.confirmText | translate}}</button>' +
             '<button ng-if="!alertGuy.translateUI" class="btn btn-primary btn-text" ng-show="alertGuy.confirmButton" ng-click="alertGuy.confirm()">{{alertGuy.confirmText}}</button>' +
-            '<button ng-if="alertGuy.translateUI" class="btn btn-primary btn-link" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText | translate}}</button>' +
-            '<button ng-if="!alertGuy.translateUI" class="btn btn-primary btn-link" ng-show="alertGuy.dismissButton" ng-click="alertGuy.dismiss()">{{alertGuy.dismissText}}</button>' +
             '</div>' +
             '</div>' +
             '</div>' +
